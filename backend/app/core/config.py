@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Create the settings class for the app
 class Settings(BaseSettings):
     app_name: str
     app_version: str
@@ -7,6 +8,6 @@ class Settings(BaseSettings):
 
     database_url: str
 
-    model_config = SettingsConfigDict(env_file='.env')    
+    model_config = SettingsConfigDict(env_file='.env') # Tell FastAPI to look in the env file
 
 settings = Settings()
