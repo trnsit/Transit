@@ -14,4 +14,4 @@ def get_db():
         yield db
 
     finally:
-        db.close() # Close the session no matter if the execution happened of failed
+        db.close() # Close the session no matter if the execution happened if failed

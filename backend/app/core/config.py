@@ -8,6 +8,7 @@ class Settings(BaseSettings):
 
     database_url: str
 
+    # Extra behavioural configuration for this Pydantic model:
     model_config = SettingsConfigDict(env_file='.env') # Tell FastAPI to look in the env file
 
 settings = Settings()
