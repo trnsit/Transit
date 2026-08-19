@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 
 from app.core.config import settings
-from app.api.routes.users import router as user_router
+from app.modules.accounts.routes import router as user_router
 
-import app.models
+import app.db
 
 app = FastAPI(
     title=settings.app_name,

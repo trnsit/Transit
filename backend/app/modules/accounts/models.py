@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING # A special flag provided by Python's 'typing' 
 
 # Only import when the type checker is parsing the code, not while executing it.
 if TYPE_CHECKING: # When the type checker/IDE analyzes the code: True, else: False.
-    from app.models.repository import Repository
+    from app.modules.repositories.models import Repository
 
 class User(Base):
     __tablename__ = 'users'

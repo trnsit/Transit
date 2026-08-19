@@ -1,14 +1,14 @@
 from sqlalchemy import select # SQLAlchemy function used to execute ORM query
 from sqlalchemy.ext.asyncio import AsyncSession # Asynchronous session
 
-from app.models.user import User
-from app.schemas.user import UserCreate, UserResponse
+from app.modules.accounts.models import User
+from app.modules.accounts.schemas import UserCreate, UserResponse
 
 class UserStore:
     def __init__(self, session: AsyncSession): # Use asynchronous session
         self.session = session
 
-    async def get_by_email(self, email: str) -> UserResponse | None:
+    async def authenticate(self, email: str) -> UserResponse | None:
         # Use the session to execute the ORM query
         result = await self.session.execute( # The execute method (of the session) executes an SQL Query.
             select(User).where(User.email == email)

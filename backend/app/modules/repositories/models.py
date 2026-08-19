@@ -10,7 +10,7 @@ from app.db.base import Base
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from app.models.user import User
+    from app.modules.accounts.models import User
 
 class Repository(Base):
     __tablename__ = 'repositories'

@@ -1,6 +1,6 @@
 from pwdlib import PasswordHash
 
-password_hash = PasswordHash.recommended()
+password_hash = PasswordHash.recommended() # Gives a recommended password-hashing config.
 
 def hash_password(password: str) -> str:
     return password_hash.hash(password)

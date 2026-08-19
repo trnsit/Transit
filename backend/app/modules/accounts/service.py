@@ -1,17 +1,17 @@
 from fastapi import HTTPException # An exception that FastAPI handles.
 
-from app.models.user import User
-from app.stores.user import UserStore
-from app.schemas.user import UserCreate, UserResponse
-from app.security.password import hash_password, verify_password
+from app.modules.accounts.models import User
+from app.modules.accounts.store import UserStore
+from app.modules.accounts.schemas import UserCreate, UserResponse
+from app.security.password import hash_password
 
 class UserService:
     def __init__(self, user_store: UserStore):
         self.store = user_store
 
     # Make the method capable of receiving email, and getting the user object by the use of UserService
-    async def get_by_email(self, email) -> UserResponse:
-        user = await self.store.get_by_email(email)
+    async def authenticate(self, email) -> UserResponse:
+        user = await self.store.authenticate(email)
 
         if not user:
             raise HTTPException(
@@ -22,7 +22,7 @@ class UserService:
         return user
 
     async def create(self, user: UserCreate) -> User:
-        if await self.store.get_by_email(user.email):
+        if await self.store.authenticate(user.email):
             raise HTTPException(
                 status_code=409,
                 detail='User already exists'
