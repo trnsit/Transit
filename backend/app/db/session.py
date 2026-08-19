@@ -1,17 +1,17 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from app.core.config import settings
 
-engine = create_engine(settings.database_url) # Instantiate engine
+engine = create_async_engine(settings.database_url) # Instantiate async engine
 
-SessionLocal = sessionmaker(bind=engine) # Instantiate the Session Maker
+SessionLocal = async_sessionmaker(bind=engine) # Instantiate the Async Session Maker
 
-def get_db():
-    db = SessionLocal()
+# Global/Shared dependency provider for database sessions
+async def get_session():
+    session = SessionLocal()
 
     try:
-        yield db
+        yield session
 
     finally:
-        db.close() # Close the session no matter if the execution happened if failed
+        await session.close() # Close the session no matter if the execution happened if failed

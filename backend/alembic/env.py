@@ -10,8 +10,8 @@ from app.core.config import settings
 from app.db.base import Base
 
 # Load the tables by importing the classes so that Alembic can discover them with 'base.metadata'
-from app.models.user import User
-from app.models.repository import Repository
+# We can import the models directory itself, since we made its __init__ file the central place of import
+import app.models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
