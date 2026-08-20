@@ -2,7 +2,7 @@ from datetime import datetime
 
 from uuid import UUID, uuid4
 
-from sqlalchemy import String, Boolean, DateTime, func
+from sqlalchemy import String, Boolean, DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -39,10 +39,65 @@ class User(Base):
         back_populates='user' # Because the corresponding attribute on the other side is named 'user'.
     )
 
+    oauth_tokens: Mapped[list['UserOAuthToken']] = relationship(
+        back_populates='user',
+        cascade='all, delete-orphan'
+    )
+
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         default=True,
         nullable=False
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False
+    )
+
+class UserOAuthToken(Base):
+    __tablename__ = 'user_oauth_tokens'
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True,
+        default=uuid4
+    )
+
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey('users.id', ondelete='CASCADE'),
+        nullable=False
+    )
+
+    user: Mapped['User'] = relationship(
+        back_populates='oauth_tokens'
+    )
+
+    provider: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False
+    )
+
+    access_token: Mapped[str] = mapped_column(
+        String(500),
+        nullable=False
+    )
+
+    refresh_token: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True
+    )
+
+    expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True
     )
 
     created_at: Mapped[datetime] = mapped_column(

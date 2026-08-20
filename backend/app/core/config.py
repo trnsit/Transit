@@ -11,6 +11,16 @@ class Settings(BaseSettings):
     secret_key: str
     jwt_algorithm: str = 'HS256'
 
+    # Google OAuth Config.
+    google_client_id: str
+    google_client_secret: str
+    google_redirect_uri: str
+
+    # GitHub OAuth Config.
+    github_client_id: str
+    github_client_secret: str
+    github_redirect_uri: str
+
     # Extra behavioural configuration for this Pydantic model:
     model_config = SettingsConfigDict(env_file='.env') # Tell FastAPI to look in the env file
 
