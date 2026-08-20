@@ -8,6 +8,9 @@ class Settings(BaseSettings):
 
     database_url: str
 
+    secret_key: str
+    jwt_algorithm: str = 'HS256'
+
     # Extra behavioural configuration for this Pydantic model:
     model_config = SettingsConfigDict(env_file='.env') # Tell FastAPI to look in the env file
 

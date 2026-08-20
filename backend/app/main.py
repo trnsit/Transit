@@ -1,3 +1,13 @@
+import sys
+
+import asyncio
+
+if sys.platform == "win32":
+    # Access dynamically to bypass IDE deprecation warnings in Python 3.14
+    policy_class = getattr(asyncio, "WindowsSelectorEventLoopPolicy")
+    set_policy = getattr(asyncio, "set_event_loop_policy")
+    set_policy(policy_class())
+
 from fastapi import FastAPI
 
 from app.core.config import settings
