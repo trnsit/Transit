@@ -1,10 +1,22 @@
-from fastapi import FastAPI, Depends
+import sys
 
-from sqlalchemy import text
-from sqlalchemy.orm import Session
+import asyncio
+
+if sys.platform == "win32":
+    # Access dynamically to bypass IDE deprecation warnings in Python 3.14
+    policy_class = getattr(asyncio, "WindowsSelectorEventLoopPolicy")
+    set_policy = getattr(asyncio, "set_event_loop_policy")
+    set_policy(policy_class())
+
+from fastapi import FastAPI
 
 from app.core.config import settings
-from app.db.session import get_db
+from app.modules.accounts.routes import router as user_router
+from app.modules.accounts.google_oauth_routes import router as google_oauth_router
+from app.modules.accounts.github_oauth_routes import router as github_oauth_router
+from app.modules.repositories.routes import router as repository_router
+
+import app.db
 
 app = FastAPI(
     title=settings.app_name,
@@ -12,12 +24,7 @@ app = FastAPI(
     debug=settings.debug
 )
 
-@app.get('/health')
-def health_check():
-    return {'status': 'ok'}
-
-@app.get('/db-health')
-def database_health_check(db: Session = Depends(get_db)):
-    result = db.execute(text('SELECT version()'))
-
-    return {'database': result.scalar()}
+app.include_router(user_router) # Include local users router in app
+app.include_router(google_oauth_router) # Include Google OAuth router
+app.include_router(github_oauth_router) # Include GitHub OAuth router
+app.include_router(repository_router) # Include repository router
