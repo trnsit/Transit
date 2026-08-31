@@ -1,7 +1,12 @@
 import urllib.parse
+
 import httpx
+
+from datetime import datetime, timezone, timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -64,15 +69,23 @@ async def github_callback(code: str, state: str, db: AsyncSession = Depends(get_
         if response.status_code != 200:
             raise HTTPException(status_code=400, detail='Failed to retrieve token from GitHub.')
             
+                # Exchange response parsing
         token_data = response.json()
         access_token = token_data.get('access_token')
+        refresh_token = token_data.get('refresh_token')
+        expires_in = token_data.get('expires_in')
         
         if not access_token:
             raise HTTPException(
                 status_code=400,
-                detail=f'GitHub authorization failed: {token_data.get('error_description', 'No access token received')}'
+                detail=f"GitHub authorization failed: {token_data.get('error_description', 'No access token received')}"
             )
             
+    # Determine expiration datetime
+    expires_at = None
+    if expires_in:
+        expires_at = datetime.now(timezone.utc) + timedelta(seconds=int(expires_in))
+
     # 3. Store or update the token in the database
     token_query = await db.execute(
         select(UserOAuthToken).where(
@@ -84,11 +97,16 @@ async def github_callback(code: str, state: str, db: AsyncSession = Depends(get_
     
     if oauth_token:
         oauth_token.access_token = access_token
+        if refresh_token:
+            oauth_token.refresh_token = refresh_token
+        oauth_token.expires_at = expires_at
     else:
         oauth_token = UserOAuthToken(
             user_id=user.id,
             provider='github',
-            access_token=access_token
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_at=expires_at
         )
         db.add(oauth_token)
         

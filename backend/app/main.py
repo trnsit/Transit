@@ -14,6 +14,7 @@ from app.core.config import settings
 from app.modules.accounts.routes import router as user_router
 from app.modules.accounts.google_oauth_routes import router as google_oauth_router
 from app.modules.accounts.github_oauth_routes import router as github_oauth_router
+from app.modules.repositories.routes import router as repository_router
 
 import app.db
 
@@ -24,5 +25,6 @@ app = FastAPI(
 )
 
 app.include_router(user_router) # Include local users router in app
-app.include_router(google_oauth_router) # Include the Google OAuth router
-app.include_router(github_oauth_router) # Include the GitHub OAuth router
+app.include_router(google_oauth_router) # Include Google OAuth router
+app.include_router(github_oauth_router) # Include GitHub OAuth router
+app.include_router(repository_router) # Include repository router

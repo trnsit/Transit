@@ -1,7 +1,9 @@
+from uuid import UUID
+
 from sqlalchemy import select # SQLAlchemy function used to execute ORM query
 from sqlalchemy.ext.asyncio import AsyncSession # Asynchronous session
 
-from app.modules.accounts.models import User
+from app.modules.accounts.models import User, UserOAuthToken
 from app.modules.accounts.schemas import UserCreate, UserResponse
 
 class UserStore:
@@ -38,7 +40,15 @@ class UserStore:
         # The 'add' method need not to be awaited because it's not I/O operation, but an in-memeory state manipulation operation.
 
         await self.session.commit() # Commit the transaction, so the INSERT actually gets persisted
-
         await self.session.refresh(user_orm) # Reload the object from the database, useful for getting database-generated values/defaults
 
         return user_orm
+
+    async def get_oauth_token(self, user_id: UUID, provider: str) -> UserOAuthToken | None:
+        result = await self.session.execute(
+            select(UserOAuthToken).where(
+                UserOAuthToken.user_id == user_id,
+                UserOAuthToken.provider == provider
+            )
+        )
+        return result.scalar_one_or_none()

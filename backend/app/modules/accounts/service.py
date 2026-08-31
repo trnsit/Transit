@@ -23,11 +23,13 @@ class UserService:
 
     async def login(self, login_data: Login) -> User:
         user = await self.store.authenticate(login_data.email)
+
         if not user or not verify_password(login_data.password, user.password_hash):
             raise HTTPException(
                 status_code=401,
                 detail='Incorrect email or password'
             )
+
         return user
 
     async def create(self, user: UserCreate) -> User:
