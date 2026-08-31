@@ -5,6 +5,7 @@ import zipfile
 import shutil
 import tempfile
 import httpx
+import asyncio
 from datetime import datetime
 from uuid import UUID
 from fastapi import HTTPException, BackgroundTasks
@@ -12,6 +13,7 @@ from fastapi import HTTPException, BackgroundTasks
 from app.modules.scans.models import Scan
 from app.modules.scans.store import ScanStore
 from app.modules.repositories.store import RepositoryStore
+from app.modules.scans.agent import ScanIntelligenceAgent
 
 # Cryptographic rules/regexes for detection and classification
 RULES = {
@@ -182,6 +184,36 @@ class ScanService:
             
             findings_data = self.scan_directory(temp_dir)
             
+            # --- AI Intelligence Agent Enrichment Stage ---
+            if findings_data:
+                agent = ScanIntelligenceAgent()
+                semaphore = asyncio.Semaphore(3)  # Limits concurrent Ollama requests to 3
+
+                async def process_finding(finding: dict):
+                    async with semaphore:
+                        # Extract the code context around the matched line
+                        context = self._get_code_context(
+                            temp_dir=temp_dir, 
+                            file_path=finding["file"], 
+                            line_number=finding["line_number"]
+                        )
+                        # Ask Ollama to audit it
+                        audit = await agent.analyze_finding(
+                            file_path=finding["file"],
+                            line_number=finding["line_number"],
+                            category=finding["category"],
+                            algorithm=finding["algorithm"],
+                            matched_line=finding["line_content"],
+                            code_context=context
+                        )
+                        # Enrich the finding dict
+                        finding["is_false_positive"] = audit.is_false_positive
+                        finding["agent_explanation"] = audit.agent_explanation
+                        finding["suggested_explanation"] = audit.suggested_explanation
+
+                # Run AI analysis for all findings concurrently (gated by semaphore)
+                await asyncio.gather(*(process_finding(f) for f in findings_data))
+            
             await self.scan_store.save_findings(scan_id, findings_data)
             await self.scan_store.update_status(
                 scan_id, 
@@ -317,3 +349,24 @@ class ScanService:
     def extract_zip(self, zip_path: str, extract_to: str):
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(extract_to)
+
+    def _get_code_context(self, temp_dir: str, file_path: str, line_number: int, range_lines: int = 10) -> str:
+        """Helper to extract surrounding code lines for AI context."""
+        try:
+            # Find the root folder extracted from the zip ball (usually exactly one directory)
+            dirs = [d for d in os.listdir(temp_dir) if os.path.isdir(os.path.join(temp_dir, d))]
+            if not dirs:
+                return ""
+            
+            full_path = os.path.join(temp_dir, dirs[0], file_path)
+            
+            with open(full_path, 'r', encoding='utf-8', errors='ignore') as f:
+                lines = f.readlines()
+            
+            # Fetch 10 lines before and after the matched line
+            start = max(0, line_number - 1 - range_lines)
+            end = min(len(lines), line_number + range_lines)
+            
+            return "".join(lines[start:end])
+        except Exception:
+            return ""

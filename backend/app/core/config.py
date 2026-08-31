@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     github_client_secret: str
     github_redirect_uri: str
 
+    # Ollama Config.
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_model: str = "llama3"
+
     # Extra behavioural configuration for this Pydantic model:
     model_config = SettingsConfigDict(env_file='.env') # Tell FastAPI to look in the env file
 

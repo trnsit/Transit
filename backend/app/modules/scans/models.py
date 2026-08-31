@@ -89,6 +89,21 @@ class ScanFinding(Base):
         nullable=False
     )
 
+    # Agent Fields:
+    is_false_positive: Mapped[bool] = mapped_column(
+        default=False
+    )
+
+    agent_explanation: Mapped[str] = mapped_column(
+        String(),
+        nullable=True
+    )
+
+    suggested_explanation: Mapped[str] = mapped_column(
+        String(),
+        nullable=True
+    )
+
     # Relationships
     scan: Mapped['Scan'] = relationship(
         back_populates='findings'

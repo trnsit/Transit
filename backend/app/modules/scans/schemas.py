@@ -13,6 +13,10 @@ class ScanFindingResponse(BaseModel):
     algorithm: str
     line_content: str
 
+    is_false_positive: bool
+    agent_explanation: str | None
+    suggested_explanation: str | None
+
     model_config = ConfigDict(from_attributes=True)
 
 class ScanResponse(BaseModel):

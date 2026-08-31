@@ -16,7 +16,7 @@ from app.modules.accounts.dependencies import get_current_user
 from app.modules.accounts.models import User, UserOAuthToken
 from app.security.jwt import create_access_token, decode_access_token
 
-router = APIRouter(prefix='/auth/github', tags=['oauth'])
+router = APIRouter(prefix='/auth/github', tags=['github-oauth'])
 
 @router.get('/login')
 async def get_github_login_url(current_user: User = Depends(get_current_user)):

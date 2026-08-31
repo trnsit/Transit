@@ -75,7 +75,11 @@ class ScanStore:
                 line_number=item["line_number"],
                 category=item["category"],
                 algorithm=item["algorithm"],
-                line_content=item["line_content"]
+                line_content=item["line_content"],
+                # Add these three lines to store agent outputs
+                is_false_positive=item.get("is_false_positive", False),
+                agent_explanation=item.get("agent_explanation"),
+                suggested_explanation=item.get("suggested_explanation")
             )
             for item in findings_data
         ]
