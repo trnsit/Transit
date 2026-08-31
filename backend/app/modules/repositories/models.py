@@ -6,6 +6,7 @@ from sqlalchemy import String, Boolean, DateTime, func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.modules.scans.models import Scan
 
 from typing import TYPE_CHECKING
 
@@ -80,4 +81,9 @@ class Repository(Base):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False
+    )
+
+    scans: Mapped[list[Scan]] = relationship(
+        back_populates='repository',
+        cascade='all, delete-orphan'
     )
