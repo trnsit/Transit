@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict # Pydantic Settings is an external package, not a part of Pydantic itself.
 
 # Create the settings class for the app
 class Settings(BaseSettings):
@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama3"
 
-    # Extra behavioural configuration for this Pydantic model:
+    # model_config - extra behavioural configuration for this Pydantic model:
     model_config = SettingsConfigDict(env_file='.env') # Tell FastAPI to look in the env file
 
 settings = Settings()

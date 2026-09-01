@@ -1,8 +1,8 @@
 import httpx
 
-from fastapi import HTTPException
-
 from uuid import UUID
+
+from fastapi import HTTPException
 
 from app.modules.repositories.models import Repository
 from app.modules.repositories.schemas import RepositoryCreate, RepositoryUpdate

@@ -1,14 +1,11 @@
 from fastapi import APIRouter, Depends
 
 from app.security.jwt import create_access_token
-
 from app.modules.accounts.dependencies import get_user_service, get_current_user
-
 from app.modules.accounts.schemas import UserCreate, UserResponse, Token, Login
-
 from app.modules.accounts.service import UserService
 
-router = APIRouter()
+router = APIRouter(tags=['accounts'])
 
 @router.post('/register', response_model=UserResponse)
 # Pass the get_user_service function as the dependency

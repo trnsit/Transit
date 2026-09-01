@@ -1,14 +1,14 @@
-from fastapi import Depends, APIRouter, status
-
 from uuid import UUID
 
-from app.modules.repositories.schemas import RepositoryCreate, RepositoryUpdate, RepositoryResponse
-from app.modules.accounts.models import User
-from app.modules.repositories.service import RepositoryService
+from fastapi import Depends, APIRouter, status
+
 from app.modules.accounts.dependencies import get_current_user
 from app.modules.repositories.dependencies import get_repository_service
+from app.modules.repositories.schemas import RepositoryCreate, RepositoryUpdate, RepositoryResponse
+from app.modules.repositories.service import RepositoryService
+from app.modules.accounts.models import User
 
-router = APIRouter(prefix='/repositories')
+router = APIRouter(prefix='/repositories', tags=['repositories'])
 
 @router.get('/{repository_id}', response_model=RepositoryResponse)
 async def get_repository_by_id(repository_id: UUID, user: User = Depends(get_current_user), service: RepositoryService = Depends(get_repository_service)):

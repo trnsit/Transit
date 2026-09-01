@@ -1,10 +1,10 @@
 from uuid import UUID
 
-from sqlalchemy import select # SQLAlchemy function used to execute ORM query
+from sqlalchemy import select # The SQLAlchemy function used to execute ORM query.
 from sqlalchemy.ext.asyncio import AsyncSession # Asynchronous session
 
 from app.modules.accounts.models import User, UserOAuthToken
-from app.modules.accounts.schemas import UserCreate, UserResponse
+from app.modules.accounts.schemas import UserResponse
 
 class UserStore:
     def __init__(self, session: AsyncSession): # Use asynchronous session
@@ -16,20 +16,20 @@ class UserStore:
             select(User).where(User.email == email)
         ) # Now, this will have a whole Result object, consisting of rows and columns.
 
-        # Execute returns a Result object, which will have the columns of whatever we have put into 'select'.
-        # In this case, we've put the whole User object, so it will have only one column, which is the object itself.
+        """ Execute returns a Result object, which will have the columns of whatever we have put into 'select'.
+        In this case, we've put the whole User object, so it will have only one column, which is the object itself. """
 
-        return result.scalar_one_or_none() # Either zero row (value), or just one; return None or the one object, and raise exception if there are more rows
+        return result.scalar_one_or_none() # Either zero row (value), or just one; return None or the one object, and raise exception if there are more rows.
 
         # The 'scalar' method, another method, returns the first column of the first row.
 
-        # The 'text' function represents the string as a proper SQL query instead of a mere string:
-            # from sqlalchemy import text
+        """ The 'text' function represents the string as a proper SQL query instead of a mere string:
+            from sqlalchemy import text
 
-            # result = db.execute(text('SELECT version()'))
+            result = db.execute(text('SELECT version()')) """
 
     async def create(self, email: str, password_hash: str) -> User:
-        # AsyncSession.add() expects a SQLAlchemy ORM instance; we cannot directly insert the UserCreate object into the add method. So:
+        # AsyncSession.add() expects an SQLAlchemy ORM instance; we cannot directly insert the UserCreate object into the add method. So:
         user_orm = User(
             email=email,
             password_hash=password_hash
@@ -41,6 +41,8 @@ class UserStore:
 
         await self.session.commit() # Commit the transaction, so the INSERT actually gets persisted
         await self.session.refresh(user_orm) # Reload the object from the database, useful for getting database-generated values/defaults
+
+        # The refresh method receives an SQLAlchemy instance, but it returns 'None'; instead it modifies the connected object in memory.
 
         return user_orm
 

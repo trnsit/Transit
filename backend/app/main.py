@@ -1,5 +1,4 @@
 import sys
-
 import asyncio
 
 if sys.platform == "win32":
@@ -25,8 +24,9 @@ app = FastAPI(
     debug=settings.debug
 )
 
-app.include_router(user_router) # Include local users router in app
-app.include_router(google_oauth_router) # Include Google OAuth router
-app.include_router(github_oauth_router) # Include GitHub OAuth router
-app.include_router(repository_router) # Include repository router
-app.include_router(scan_router) # Include scan router
+# Include each module's router in app
+app.include_router(user_router)
+app.include_router(google_oauth_router)
+app.include_router(github_oauth_router)
+app.include_router(repository_router)
+app.include_router(scan_router)

@@ -1,11 +1,8 @@
-import json
-
 import httpx
 
 from pydantic import BaseModel
 
 from app.core.config import settings
-
 
 class AuditResult(BaseModel):
     is_false_positive: bool
@@ -30,7 +27,7 @@ class ScanIntelligenceAgent:
         prompt = f"""
         You are a cryptographic security expert auditing a codebase for migration to post-quantum and modern secure cryptography.
         A static analysis tool flagged a potential issue:
-        
+
         - File Path: {file_path}
         - Line Number: {line_number}
         - Matched Category: {category}

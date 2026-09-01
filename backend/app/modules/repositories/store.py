@@ -1,12 +1,11 @@
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from sqlalchemy import select
-
-from app.modules.repositories.schemas import RepositoryCreate, RepositoryUpdate
 from app.modules.repositories.models import Repository
 from app.modules.accounts.models import UserOAuthToken
+from app.modules.repositories.schemas import RepositoryCreate, RepositoryUpdate
 
 class RepositoryStore:
     def __init__(self, session: AsyncSession):
