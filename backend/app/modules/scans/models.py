@@ -7,11 +7,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from app.modules.repositories.models import Repository
-
 class Scan(Base):
     __tablename__ = 'scans'
 
@@ -42,11 +37,9 @@ class Scan(Base):
         nullable=True
     )
 
-    # Relationships
-    repository: Mapped['Repository'] = relationship(
-        back_populates='scans'
-    )
-    
+    # RELATIONSHIPS:
+    # This relationship is kept intact becuase it's exclusive to the scans module.
+
     findings: Mapped[list['ScanFinding']] = relationship(
         back_populates='scan',
         cascade='all, delete-orphan'

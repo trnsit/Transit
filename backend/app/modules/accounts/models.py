@@ -7,13 +7,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 
-# Just to keep the 'forward import' (like importing the 'Repository' class inside the relationship in this case) valid in the IDE; not necessary.
-from typing import TYPE_CHECKING # A special flag provided by Python's 'typing' module.
-
-# Only import when the type checker is parsing the code, not while executing it.
-if TYPE_CHECKING: # When the type checker / IDE analyzes the code: True, else: False.
-    from app.modules.repositories.models import Repository
-
 class User(Base):
     __tablename__ = 'users'
 
@@ -64,17 +57,12 @@ class User(Base):
     already having a registry dict having each models' name and their respective class object as the value,
     imports everything correctly. ie; for Python it is just valid and skippable, but SQLAlchemy, combined, does the forward import work. """
 
-    repositories: Mapped[list['Repository']] = relationship( # 'list' is because it's a one-to-many relationship; the user could have many repos.
-        back_populates='user' # Because the corresponding attribute on the other side is named 'user'.
-    )
-
-    oauth_tokens: Mapped[list['UserOAuthToken']] = relationship(
-        back_populates='user',
+    oauth_tokens: Mapped[list['UserOAuthToken']] = relationship( # 'list' is because it's a one-to-many relationship; the user could have many repos.
+        back_populates='user', # Because the corresponding attribute on the other side is named 'user'.
         cascade='all, delete-orphan' # This is two rules, actually: 'all', a shorthand for rules like save-update, merge, refresh-expire, expunge, delete, and 'delete-orphan'.
 
-        # 'cascade' defines what automatically happens to the child if something has happened to the parent.
-
-        # 'cascade=...' is the ORM-level config.
+        """ 'cascade' defines what automatically happens to the child if something has happened to the parent;
+        'cascade=...' is the ORM-level config. """
     )
 
 class UserOAuthToken(Base):

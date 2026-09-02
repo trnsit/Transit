@@ -6,12 +6,6 @@ from sqlalchemy import String, Boolean, DateTime, func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.modules.scans.models import Scan
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from app.modules.accounts.models import User
 
 class Repository(Base):
     __tablename__ = 'repositories'
@@ -27,12 +21,10 @@ class Repository(Base):
     ) # This will only give you repository.user_id; no relationship between the tables users and repositories
 
     # Relationships are explicitly defined to access the table, like 'repository.user', or 'user.repositories'.
+
     # You define a relationship explicitly at the both sides for both-end access.
 
-    # Create a relationship with the users table
-    user: Mapped['User'] = relationship(
-        back_populates='repositories' # The other-side attribute; named 'repositories there, in this case.
-    )
+    # We are not defining the relationships in this case because we follow the microservice architecure; no direct connection between the tables.
 
     provider: Mapped[str] = mapped_column(
         String(100),
@@ -81,9 +73,4 @@ class Repository(Base):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False
-    )
-
-    scans: Mapped[list[Scan]] = relationship(
-        back_populates='repository',
-        cascade='all, delete-orphan'
     )

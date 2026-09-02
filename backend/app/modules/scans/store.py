@@ -16,7 +16,7 @@ class ScanStore:
     async def get_by_id(self, scan_id: UUID, user_id: UUID) -> Scan | None:
         result = await self.session.execute(
             select(Scan)
-            .join(Scan.repository)
+            .join(Repository, Scan.repository_id == Repository.id) # Explicit join (since we're following the microservice architecture)
             .options(selectinload(Scan.findings))
             .where(
                 Scan.id == scan_id,
@@ -29,7 +29,7 @@ class ScanStore:
     async def list_by_repository(self, repository_id: UUID, user_id: UUID) -> list[Scan]:
         result = await self.session.execute(
             select(Scan)
-            .join(Scan.repository)
+            .join(Repository, Scan.repository_id == Repository.id)
             .options(selectinload(Scan.findings))
             .where(
                 Scan.repository_id == repository_id,
