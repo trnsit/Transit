@@ -5,14 +5,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_session
 from app.modules.scans.store import ScanStore
 from app.modules.scans.service import ScanService
-from app.modules.repositories.store import RepositoryStore
-from app.modules.repositories.dependencies import get_repository_store
+from app.modules.scans.clients.accounts import AccountsClient
+from app.modules.scans.clients.repositories import RepositoriesClient
 
 def get_scan_store(session: AsyncSession = Depends(get_session)) -> ScanStore:
     return ScanStore(session)
 
-def get_scan_service(
-    scan_store: ScanStore = Depends(get_scan_store),
-    repo_store: RepositoryStore = Depends(get_repository_store)
-) -> ScanService:
-    return ScanService(scan_store, repo_store)
+def get_scan_service(scan_store: ScanStore = Depends(get_scan_store)) -> ScanService:
+    return ScanService(scan_store)
+
+def get_accounts_client() -> AccountsClient:
+    return AccountsClient()
+
+def get_repositories_client() -> RepositoriesClient:
+    return RepositoriesClient()

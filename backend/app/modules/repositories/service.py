@@ -51,15 +51,7 @@ class RepositoryService:
 
         return result
 
-    async def list_github_repositories(self, user_id: UUID):
-        token = await self.store.get_github_token(user_id)
-
-        if not token:
-            raise HTTPException(
-                status_code=400,
-                detail='GitHub account not connected. Please connect your GitHub account first.'
-            )
-
+    async def list_github_repositories(self, token: str):
         async with httpx.AsyncClient() as client:
             headers = {
                 'Authorization': f'token {token}',

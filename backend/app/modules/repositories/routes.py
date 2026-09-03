@@ -1,15 +1,17 @@
 from uuid import UUID
 
-from fastapi import Depends, APIRouter, status
+from fastapi import Depends, APIRouter, status, HTTPException
 
 from app.modules.accounts.dependencies import get_current_user
-from app.modules.repositories.dependencies import get_repository_service
+from app.modules.repositories.dependencies import get_repository_service, get_accounts_client
+from app.modules.repositories.clients.accounts import AccountsClient
 from app.modules.repositories.schemas import RepositoryCreate, RepositoryUpdate, RepositoryResponse
 from app.modules.repositories.service import RepositoryService
 from app.modules.accounts.models import User
 
 router = APIRouter(prefix='/repositories', tags=['repositories'])
 
+# API CRUD ENDPOINTS:
 @router.get('/{repository_id}', response_model=RepositoryResponse)
 async def get_repository_by_id(repository_id: UUID, user: User = Depends(get_current_user), service: RepositoryService = Depends(get_repository_service)):
     return await service.get_by_id(user.id, repository_id)
@@ -30,6 +32,20 @@ async def update_repository(data: RepositoryUpdate, repository_id: UUID, user: U
 async def delete_repository(repository_id: UUID, user: User = Depends(get_current_user), service: RepositoryService = Depends(get_repository_service)):
     return await service.delete(user.id, repository_id)
 
+# REMOTE REPOSITORY ENDPOINT:
 @router.get('/github/remote', response_model=list[RepositoryCreate])
-async def list_remote_github_repositories(user: User = Depends(get_current_user), service: RepositoryService = Depends(get_repository_service)):
-    return await service.list_github_repositories(user.id)
+async def list_remote_github_repositories(user: User = Depends(get_current_user), service: RepositoryService = Depends(get_repository_service), accounts_client: AccountsClient = Depends(get_accounts_client)):
+    token = await accounts_client.get_github_token(user.id)
+
+    if not token:
+        raise HTTPException(
+            status_code=400,
+            detail='GitHub account not connected. Please connect your GitHub account first.'
+        )
+
+    return await service.list_github_repositories(token)
+
+# INTERNAL COMMUNICATION ENDPOINT:
+@router.get('/internal/users/{user_id}/repositories/{repository_id}', response_model=RepositoryResponse)
+async def get_internal_repository(repository_id: UUID, user_id: UUID, service: RepositoryService = Depends(get_repository_service)):
+    return await service.get_by_id(user_id, repository_id)

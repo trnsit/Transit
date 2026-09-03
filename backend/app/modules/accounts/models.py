@@ -61,9 +61,10 @@ class User(Base):
         back_populates='user', # Because the corresponding attribute on the other side is named 'user'.
         cascade='all, delete-orphan' # This is two rules, actually: 'all', a shorthand for rules like save-update, merge, refresh-expire, expunge, delete, and 'delete-orphan'.
 
-        """ 'cascade' defines what automatically happens to the child if something has happened to the parent;
-        'cascade=...' is the ORM-level config. """
     )
+
+    """ 'cascade' defines what automatically happens to the child if something has happened to the parent;
+    'cascade=...' is the ORM-level config. """
 
 class UserOAuthToken(Base):
     __tablename__ = 'user_oauth_tokens'

@@ -1,9 +1,11 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status, BackgroundTasks
+from fastapi import APIRouter, Depends, status, BackgroundTasks, HTTPException
 
 from app.modules.accounts.dependencies import get_current_user
-from app.modules.scans.dependencies import get_scan_service
+from app.modules.scans.dependencies import get_scan_service, get_accounts_client, get_repositories_client
+from app.modules.scans.clients.accounts import AccountsClient
+from app.modules.scans.clients.repositories import RepositoriesClient
 from app.modules.scans.service import ScanService
 from app.modules.scans.schemas import ScanResponse
 from app.modules.accounts.models import User
@@ -14,14 +16,40 @@ router = APIRouter(prefix='/scans', tags=['scans'])
 @router.post('/repository/{repository_id}', response_model=ScanResponse, status_code=status.HTTP_202_ACCEPTED)
 async def trigger_scan(
     repository_id: UUID,
-    background_tasks: BackgroundTasks, # Notice we didn't use 'Depends' even though it's a dependency.
+    background_tasks: BackgroundTasks,
     user: User = Depends(get_current_user),
-    service: ScanService = Depends(get_scan_service)
+    service: ScanService = Depends(get_scan_service),
+    accounts_client: AccountsClient = Depends(get_accounts_client),
+    repos_client: RepositoriesClient = Depends(get_repositories_client)
 ):
     """ BackgroundTasks is a special built-in "VIP" type in FastAPI (also are Request, Response, and WebSocket)
     that it recognizes instantly without needing Depends. """
 
-    return await service.trigger_scan(user.id, repository_id, background_tasks)
+    # 1. Fetch repo info via internal client (verifies user ownership)
+    repo = await repos_client.get_repository(user.id, repository_id)
+
+    if not repo:
+        raise HTTPException(
+            status_code=404,
+            detail='Repository not found'
+        )
+
+    # 2. Fetch GitHub token via internal client
+    token = await accounts_client.get_github_token(user.id)
+
+    if not token:
+        raise HTTPException(
+            status_code=400,
+            detail='GitHub account not connected. Please connect your GitHub account first.'
+        )
+
+    # 3. Trigger the scan
+    return await service.trigger_scan(
+        repository_id=repository_id,
+        repo_full_name=repo.full_name,
+        token=token,
+        background_tasks=background_tasks
+    )
 
 @router.get('/{scan_id}', response_model=ScanResponse)
 async def get_scan_details(

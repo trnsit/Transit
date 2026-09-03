@@ -4,7 +4,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.repositories.models import Repository
-from app.modules.accounts.models import UserOAuthToken
 from app.modules.repositories.schemas import RepositoryCreate, RepositoryUpdate
 
 class RepositoryStore:
@@ -64,15 +63,3 @@ class RepositoryStore:
         await self.session.commit()
 
         return True
-
-    async def get_github_token(self, user_id: UUID) -> str | None:
-        result = await self.session.execute(
-            select(UserOAuthToken).where(
-                UserOAuthToken.user_id == user_id,
-                UserOAuthToken.provider == 'github'
-            )
-        )
-
-        oauth_token = result.scalar_one_or_none()
-
-        return oauth_token.access_token if oauth_token else None

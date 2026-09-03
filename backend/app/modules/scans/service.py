@@ -15,7 +15,6 @@ from fastapi import HTTPException, BackgroundTasks
 
 from app.modules.scans.models import Scan
 from app.modules.scans.store import ScanStore
-from app.modules.repositories.store import RepositoryStore
 from app.modules.scans.agent import ScanIntelligenceAgent
 
 # CRYPTOGRAPHIC RULES/REGEXES FOR DETECTION AND CLASSIFICATION:
@@ -161,13 +160,13 @@ class PythonCryptoVisitor(ast.NodeVisitor):
 
 
 class ScanService:
-    def __init__(self, scan_store: ScanStore, repo_store: RepositoryStore):
+    def __init__(self, scan_store: ScanStore):
         self.scan_store = scan_store
-        self.repo_store = repo_store
         self.scannable_extensions = {
             ".py", ".js", ".ts", ".go", ".java", ".cpp", ".c", 
             ".rs", ".cs", ".php", ".rb", ".swift", ".kt", ".h"
         }
+
         self.ignored_dirs = {
             "node_modules", "venv", ".venv", "env", ".git", 
             "__pycache__", "dist", "build", ".github"
@@ -176,46 +175,26 @@ class ScanService:
     # API CORE METHODS
     async def get_scan(self, user_id: UUID, scan_id: UUID) -> Scan:
         scan = await self.scan_store.get_by_id(scan_id, user_id)
+
         if not scan:
             raise HTTPException(
                 status_code=404,
                 detail='Scan not found'
             )
+
         return scan
 
     async def list_scans(self, user_id: UUID, repository_id: UUID) -> list[Scan]:
-        repo = await self.repo_store.get_by_id(user_id, repository_id)
-        if not repo:
-            raise HTTPException(
-                status_code=404,
-                detail='Repository not found'
-            )
         return await self.scan_store.list_by_repository(repository_id, user_id)
 
     # 2. Authenticate the user and repository and assign tasks in the background -> run_scan_job
-    async def trigger_scan(self, user_id: UUID, repository_id: UUID, background_tasks: BackgroundTasks) -> Scan:
-        repo = await self.repo_store.get_by_id(user_id, repository_id)
-
-        if not repo:
-            raise HTTPException(
-                status_code=404,
-                detail='Repository not found'
-            )
-
-        token = await self.repo_store.get_github_token(user_id)
-
-        if not token:
-            raise HTTPException(
-                status_code=400,
-                detail='GitHub account not connected. Please connect your GitHub account first.'
-            )
-
+    async def trigger_scan(self, repository_id: UUID, repo_full_name: str, token: str, background_tasks: BackgroundTasks) -> Scan:
         scan = await self.scan_store.create(repository_id)
 
         background_tasks.add_task(
             self.run_scan_job, 
             scan.id, 
-            repo.full_name, 
+            repo_full_name, 
             token
         )
 
