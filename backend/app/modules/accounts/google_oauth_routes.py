@@ -172,7 +172,7 @@ async def google_callback(
     await session.commit()
 
     # 6. Generate our own local JWT access token for this user
-    local_access_token = create_access_token(data={'sub': user.email})
+    local_access_token = create_access_token(data={'sub': user.email, 'user_id': str(user.id)})
 
     # Redirect back to the frontend login-success handler page
     return RedirectResponse(
