@@ -7,7 +7,6 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.scans.models import Scan, ScanFinding
-from app.modules.repositories.models import Repository
 
 class ScanStore:
     def __init__(self, session: AsyncSession):
@@ -16,11 +15,10 @@ class ScanStore:
     async def get_by_id(self, scan_id: UUID, user_id: UUID) -> Scan | None:
         result = await self.session.execute(
             select(Scan)
-            .join(Repository, Scan.repository_id == Repository.id) # Explicit join (since we're following the microservice architecture)
             .options(selectinload(Scan.findings))
             .where(
                 Scan.id == scan_id,
-                Repository.user_id == user_id
+                Scan.user_id == user_id
             )
         )
 
@@ -29,20 +27,20 @@ class ScanStore:
     async def list_by_repository(self, repository_id: UUID, user_id: UUID) -> list[Scan]:
         result = await self.session.execute(
             select(Scan)
-            .join(Repository, Scan.repository_id == Repository.id)
             .options(selectinload(Scan.findings))
             .where(
                 Scan.repository_id == repository_id,
-                Repository.user_id == user_id
+                Scan.user_id == user_id
             )
             .order_by(Scan.created_at.desc())
         )
 
         return list(result.scalars().all())
 
-    async def create(self, repository_id: UUID) -> Scan:
+    async def create(self, repository_id: UUID, user_id: UUID) -> Scan:
         scan = Scan(
             repository_id=repository_id,
+            user_id=user_id,
             status='pending'
         )
 

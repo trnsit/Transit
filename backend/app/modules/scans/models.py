@@ -15,6 +15,10 @@ class Scan(Base):
         default=uuid4
     )
 
+    user_id: Mapped[UUID] = mapped_column(
+        nullable=False
+    )
+
     repository_id: Mapped[UUID] = mapped_column(
         ForeignKey('repositories.id', ondelete='CASCADE'),
         nullable=False

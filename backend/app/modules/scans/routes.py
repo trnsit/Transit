@@ -44,6 +44,7 @@ async def trigger_scan(
 
     # 3. Trigger the scan
     return await service.trigger_scan(
+        user_id=user.id,
         repository_id=repository_id,
         repo_full_name=repo.full_name,
         token=token,

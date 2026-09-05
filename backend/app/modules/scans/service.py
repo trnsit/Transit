@@ -188,8 +188,15 @@ class ScanService:
         return await self.scan_store.list_by_repository(repository_id, user_id)
 
     # 2. Authenticate the user and repository and assign tasks in the background -> run_scan_job
-    async def trigger_scan(self, repository_id: UUID, repo_full_name: str, token: str, background_tasks: BackgroundTasks) -> Scan:
-        scan = await self.scan_store.create(repository_id)
+    async def trigger_scan(
+        self, 
+        user_id: UUID, 
+        repository_id: UUID, 
+        repo_full_name: str, 
+        token: str, 
+        background_tasks: BackgroundTasks
+    ) -> Scan:
+        scan = await self.scan_store.create(repository_id, user_id)
 
         background_tasks.add_task(
             self.run_scan_job, 
