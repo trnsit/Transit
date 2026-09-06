@@ -29,7 +29,7 @@ async def profile(current_user = Depends(get_current_user)):
 # INTERNAL COMMUNICATION ENDPOINT:
 @router.get('/internal/users/{user_id}/tokens/{provider}')
 async def get_user_auth_token(user_id: UUID, provider: str, service: UserService = Depends(get_user_service)):
-    token = service.get_user_service(user_id, provider)
+    token = await service.get_oauth_token(user_id, provider)
 
     if not token:
         raise HTTPException(
