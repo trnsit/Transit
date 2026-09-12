@@ -4,9 +4,9 @@ from uuid import UUID
 
 from fastapi import HTTPException
 
-from app.modules.repositories.models import Repository
-from app.modules.repositories.schemas import RepositoryCreate, RepositoryUpdate
-from app.modules.repositories.store import RepositoryStore
+from .models import Repository
+from .schemas import RepositoryCreate, RepositoryUpdate
+from .store import RepositoryStore
 
 class RepositoryService:
     def __init__(self, store: RepositoryStore):

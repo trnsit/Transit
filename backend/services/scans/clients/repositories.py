@@ -1,3 +1,4 @@
+import os
 import httpx
 
 from uuid import UUID
@@ -11,8 +12,8 @@ class RepositoryInfo(BaseModel):
     full_name: str
 
 class RepositoriesClient:
-    def __init__(self, base_url: str = 'http://127.0.0.1:8000'):
-        self.base_url = base_url
+    def __init__(self, base_url: str | None = None):
+        self.base_url = base_url or os.getenv('REPOSITORIES_SERVICE_URL', 'http://127.0.0.1:8002')
 
     async def get_repository(self, user_id: UUID, repository_id: UUID) -> RepositoryInfo | None:
         async with httpx.AsyncClient() as client:

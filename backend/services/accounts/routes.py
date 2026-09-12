@@ -3,9 +3,9 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.security.jwt import create_access_token
-from app.modules.accounts.dependencies import get_user_service, get_current_user
-from app.modules.accounts.schemas import UserCreate, UserResponse, Token, Login
-from app.modules.accounts.service import UserService
+from .dependencies import get_user_service, get_current_user
+from .schemas import UserCreate, UserResponse, Token, Login
+from .service import UserService
 
 router = APIRouter(tags=['accounts'])
 

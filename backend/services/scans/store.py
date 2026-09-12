@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.scans.models import Scan, ScanFinding
+from .models import Scan, ScanFinding
 
 class ScanStore:
     def __init__(self, session: AsyncSession):

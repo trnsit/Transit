@@ -14,7 +14,7 @@ from app.core.config import settings
 from app.db.session import get_session
 from app.security.jwt import create_access_token, decode_access_token
 from app.security.password import hash_password
-from app.modules.accounts.models import User, UserOAuthToken
+from .models import User, UserOAuthToken
 
 router = APIRouter(prefix='/auth/google', tags=['google-oauth'])
 

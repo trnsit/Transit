@@ -13,9 +13,9 @@ from datetime import datetime
 
 from fastapi import HTTPException, BackgroundTasks
 
-from app.modules.scans.models import Scan
-from app.modules.scans.store import ScanStore
-from app.modules.scans.agent import ScanIntelligenceAgent
+from .models import Scan
+from .store import ScanStore
+from .agent import ScanIntelligenceAgent
 
 # CRYPTOGRAPHIC RULES/REGEXES FOR DETECTION AND CLASSIFICATION:
 """ We are creating a specific compiled pattern (a specific "detector") for each cryptographic algorithm family.

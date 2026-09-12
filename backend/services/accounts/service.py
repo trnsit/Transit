@@ -2,9 +2,9 @@ from uuid import UUID
 
 from fastapi import HTTPException # An exception that FastAPI handles.
 
-from app.modules.accounts.models import User
-from app.modules.accounts.store import UserStore
-from app.modules.accounts.schemas import UserCreate, UserResponse, Login
+from .models import User
+from .store import UserStore
+from .schemas import UserCreate, UserResponse, Login
 from app.security.password import hash_password, verify_password
 
 class UserService:

@@ -3,10 +3,10 @@ from uuid import UUID
 from fastapi import Depends, APIRouter, status, HTTPException
 
 from app.core.dependencies import CurrentUser, get_current_user
-from app.modules.repositories.dependencies import get_repository_service, get_accounts_client
-from app.modules.repositories.clients.accounts import AccountsClient
-from app.modules.repositories.schemas import RepositoryCreate, RepositoryUpdate, RepositoryResponse
-from app.modules.repositories.service import RepositoryService
+from .dependencies import get_repository_service, get_accounts_client
+from .clients.accounts import AccountsClient
+from .schemas import RepositoryCreate, RepositoryUpdate, RepositoryResponse
+from .service import RepositoryService
 
 router = APIRouter(prefix='/repositories', tags=['repositories'])
 

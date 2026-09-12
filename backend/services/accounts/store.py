@@ -3,8 +3,8 @@ from uuid import UUID
 from sqlalchemy import select # The SQLAlchemy function used to execute ORM query.
 from sqlalchemy.ext.asyncio import AsyncSession # Asynchronous session
 
-from app.modules.accounts.models import User, UserOAuthToken
-from app.modules.accounts.schemas import UserResponse
+from .models import User, UserOAuthToken
+from .schemas import UserResponse
 
 class UserStore:
     def __init__(self, session: AsyncSession): # Use asynchronous session

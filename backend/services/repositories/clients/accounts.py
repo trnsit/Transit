@@ -1,3 +1,4 @@
+import os
 import httpx
 
 from uuid import UUID
@@ -5,8 +6,12 @@ from uuid import UUID
 from fastapi import HTTPException
 
 class AccountsClient:
-    def __init__(self, base_url: str = 'http://127.0.0.1:8000'):
-        self.base_url = base_url
+    def __init__(self, base_url: str | None = None):
+        """ 1. If passed directly (e.g. during unit testing), use it.
+        2. Otherwise read ACCOUNTS_SERVICE_URL from environment / Docker.
+        3. Default to local port 8001 for local development. """
+
+        self.base_url = base_url or os.getenv('ACCOUNTS_SERVICE_URL', 'http://127.0.0.1:8001')
 
     async def get_github_token(self, user_id: UUID) -> str | None:
         async with httpx.AsyncClient() as client:

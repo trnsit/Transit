@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_session
 from app.security.jwt import decode_access_token
-from app.modules.accounts.models import User
-from app.modules.accounts.store import UserStore
-from app.modules.accounts.service import UserService
+from .models import User
+from .store import UserStore
+from .service import UserService
 
 # oauth2_scheme looking for token in 'Authorization: Bearer <token>' header
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login') # Use standard url or register

@@ -3,11 +3,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status, BackgroundTasks, HTTPException
 
 from app.core.dependencies import CurrentUser, get_current_user
-from app.modules.scans.dependencies import get_scan_service, get_accounts_client, get_repositories_client
-from app.modules.scans.clients.accounts import AccountsClient
-from app.modules.scans.clients.repositories import RepositoriesClient
-from app.modules.scans.service import ScanService
-from app.modules.scans.schemas import ScanResponse
+from .dependencies import get_scan_service, get_accounts_client, get_repositories_client
+from .clients.accounts import AccountsClient
+from .clients.repositories import RepositoriesClient
+from .service import ScanService
+from .schemas import ScanResponse
 
 router = APIRouter(prefix='/scans', tags=['scans'])
 
