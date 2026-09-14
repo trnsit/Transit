@@ -1,2 +1,3 @@
-import app.modules.accounts.models
-import app.modules.repositories.models
+import services.accounts.models
+import services.repositories.models
+import services.scans.models

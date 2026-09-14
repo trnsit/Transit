@@ -1,12 +1,12 @@
 import httpx
 
-from fastapi import HTTPException
-
 from uuid import UUID
 
-from app.modules.repositories.models import Repository
-from app.modules.repositories.schemas import RepositoryCreate, RepositoryUpdate
-from app.modules.repositories.store import RepositoryStore
+from fastapi import HTTPException
+
+from .models import Repository
+from .schemas import RepositoryCreate, RepositoryUpdate
+from .store import RepositoryStore
 
 class RepositoryService:
     def __init__(self, store: RepositoryStore):
@@ -51,15 +51,7 @@ class RepositoryService:
 
         return result
 
-    async def list_github_repositories(self, user_id: UUID):
-        token = await self.store.get_github_token(user_id)
-
-        if not token:
-            raise HTTPException(
-                status_code=400,
-                detail='GitHub account not connected. Please connect your GitHub account first.'
-            )
-
+    async def list_github_repositories(self, token: str):
         async with httpx.AsyncClient() as client:
             headers = {
                 'Authorization': f'token {token}',

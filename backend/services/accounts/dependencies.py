@@ -4,13 +4,18 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app.db.session import get_session
-from app.modules.accounts.models import User
-from app.modules.accounts.store import UserStore
-from app.modules.accounts.service import UserService
 from app.security.jwt import decode_access_token
+from .models import User
+from .store import UserStore
+from .service import UserService
 
-# OAuth2 scheme looking for token in 'Authorization: Bearer <token>' header
+# oauth2_scheme looking for token in 'Authorization: Bearer <token>' header
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login') # Use standard url or register
+
+""" OAuth2PasswordBearer automatically:
+    1. Finds the Authorization header.
+    2. Strips away the word "Bearer " and extracts just the raw token string.
+    3. Adds the little Green Padlock / "Authorize" button in FastAPI's Swagger UI documentation. """
 
 def get_user_store(session: Session = Depends(get_session)) -> UserStore:
     return UserStore(session)

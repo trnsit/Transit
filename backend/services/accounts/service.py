@@ -1,8 +1,10 @@
+from uuid import UUID
+
 from fastapi import HTTPException # An exception that FastAPI handles.
 
-from app.modules.accounts.models import User
-from app.modules.accounts.store import UserStore
-from app.modules.accounts.schemas import UserCreate, UserResponse, Login
+from .models import User
+from .store import UserStore
+from .schemas import UserCreate, UserResponse, Login
 from app.security.password import hash_password, verify_password
 
 class UserService:
@@ -45,3 +47,8 @@ class UserService:
             email=user.email,
             password_hash=password_hash
         )
+
+    async def get_oauth_token(self, user_id: UUID, provider: str) -> str | None:
+        token = await self.store.get_oauth_token(user_id, provider)
+
+        return token.access_token if token else None
