@@ -38,6 +38,18 @@ http:
 
       service: scans-service
 
+    intelligence-router:
+      rule: 'PathPrefix(`/api/v1/intelligence`)'
+
+      entryPoints:
+        - web
+
+      middlewares:
+        - cors-headers
+        - api-strip
+
+      service: intelligence-service
+
   # HEADERS & PATH TRANSFORMATIONS
   middlewares:
     # Strips '/api/v1' so microservices receive clean paths (/repositories, /scans, etc.).
@@ -91,3 +103,8 @@ http:
       loadBalancer:
         servers:
           - url: "http://127.0.0.1:8003"
+
+    intelligence-service:
+      loadBalancer:
+        servers:
+          - url: 'http://127.0.0.1:8004'

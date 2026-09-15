@@ -2,8 +2,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict # Pydantic Settin
 
 # Create the settings class for the app
 class Settings(BaseSettings):
-    app_name: str
-    app_version: str
     debug: bool
 
     database_url: str
